@@ -84,10 +84,22 @@ public class DocumentService {
     }
 
     @Transactional
-    public void deleteDocument(Document document) {
-        documentRepository.delete(document);
+    public void deleteDocument(Document document, UserDetails userDetails) {
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format("user with name [%s] not found", userDetails.getUsername()))
+                );
+        document.setAuthor(user);
 
-        IndexDocument indexDocument = documentMapper.mapDocumentToIndexDocument(document);
+        Document removedDocument = documentRepository.findDocumentByDocumentName(document.getDocumentName())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format("document with name [%s] not found", document.getDocumentName()))
+                );
+
+
+        documentRepository.delete(removedDocument);
+
+        IndexDocument indexDocument = documentMapper.mapDocumentToIndexDocument(removedDocument);
         indexDocumentRepository.delete(indexDocument);
     }
 
@@ -98,9 +110,5 @@ public class DocumentService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         String.format("document with name [%s] and download date [%s] not found", filename, downloadTime))
                 );
-    }
-
-    public List<Document> getAllDocuments() {
-        return documentRepository.findAll();
     }
 }

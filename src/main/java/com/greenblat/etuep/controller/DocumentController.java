@@ -41,8 +41,9 @@ public class DocumentController {
     }
 
     @DeleteMapping("/delete")
-    public void deleteDocument(@RequestBody Document document) {
-        documentService.deleteDocument(document);
+    public void deleteDocument(@RequestBody Document document,
+                               @AuthenticationPrincipal UserDetails userDetails) {
+        documentService.deleteDocument(document, userDetails);
     }
 
     @GetMapping("/search")
