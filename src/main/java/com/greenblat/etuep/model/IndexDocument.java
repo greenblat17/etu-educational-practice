@@ -13,7 +13,7 @@ import javax.persistence.Id;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@SolrDocument(collection = "document")
+@SolrDocument(collection = "index_document")
 public class IndexDocument {
 
     @Id
