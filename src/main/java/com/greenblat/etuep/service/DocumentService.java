@@ -35,10 +35,7 @@ public class DocumentService {
     @Transactional
     public DocumentResponse saveDocument(MultipartFile file, String filename, UserDetails userDetails) {
 
-        User user = userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        String.format("user with name [%s] not found", userDetails.getUsername()))
-                );
+        User user = findUser(userDetails.getUsername());
 
 
         Document mapToDocument = documentMapper.mapToDocument(file, filename, user);
@@ -62,10 +59,7 @@ public class DocumentService {
     @SneakyThrows
     @Transactional
     public Document updateDocument(MultipartFile file, String filename) {
-        Document updatedDocument = documentRepository.findDocumentByDocumentName(filename)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        String.format("document with name [%s] not found", filename))
-                );
+        Document updatedDocument = findDocument(filename);
 
         byte[] updatedText = file.getBytes();
         updatedDocument.setDocumentText(updatedText);
@@ -85,16 +79,10 @@ public class DocumentService {
 
     @Transactional
     public void deleteDocument(Document document, UserDetails userDetails) {
-        User user = userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        String.format("user with name [%s] not found", userDetails.getUsername()))
-                );
+        User user = findUser(userDetails.getUsername());
         document.setAuthor(user);
 
-        Document removedDocument = documentRepository.findDocumentByDocumentName(document.getDocumentName())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        String.format("document with name [%s] not found", document.getDocumentName()))
-                );
+        Document removedDocument = findDocument(document.getDocumentName());
 
 
         documentRepository.delete(removedDocument);
@@ -109,6 +97,20 @@ public class DocumentService {
         return documentRepository.findDocumentByDocumentNameAndDownloadDate(filename, date)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         String.format("document with name [%s] and download date [%s] not found", filename, downloadTime))
+                );
+    }
+
+    private User findUser(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format("user with name [%s] not found", username))
+                );
+    }
+
+    private Document findDocument(String filename) {
+        return documentRepository.findDocumentByDocumentName(filename)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format("document with name [%s] not found", filename))
                 );
     }
 }
