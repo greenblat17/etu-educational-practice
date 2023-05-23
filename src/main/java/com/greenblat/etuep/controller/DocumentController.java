@@ -47,7 +47,7 @@ public class DocumentController {
     }
 
     @GetMapping("/search")
-    public List<Document> searchDocument(@RequestParam("search-line") String searchLine) {
+    public List<DocumentResponse> searchDocument(@RequestParam("search-line") String searchLine) {
         return indexDocumentService.searchDocument(searchLine);
     }
 

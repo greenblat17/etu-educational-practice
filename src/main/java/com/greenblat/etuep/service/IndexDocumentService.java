@@ -1,6 +1,8 @@
 package com.greenblat.etuep.service;
 
+import com.greenblat.etuep.dto.DocumentResponse;
 import com.greenblat.etuep.exception.ResourceNotFoundException;
+import com.greenblat.etuep.mapper.DocumentMapper;
 import com.greenblat.etuep.model.Document;
 import com.greenblat.etuep.model.IndexDocument;
 import com.greenblat.etuep.repository.DocumentRepository;
@@ -19,18 +21,28 @@ public class IndexDocumentService {
 
     private final IndexDocumentRepository indexDocumentRepository;
     private final DocumentRepository documentRepository;
+    private final DocumentMapper documentMapper;
 
-    public List<Document> searchDocument(String searchLine) {
+    public List<DocumentResponse> searchDocument(String searchLine) {
         List<IndexDocument> indexDocuments = indexDocumentRepository.findByTextContains(searchLine);
 
         return indexDocuments.stream()
-                .map(indexDocument -> {
-                    Long id = indexDocument.getId();
-                    Document document = documentRepository.findById(id)
-                            .orElseThrow(() -> new ResourceNotFoundException(
-                                    String.format("index for document with id [%d] not found", id))
-                            );
-                    return document;
-                }).collect(Collectors.toList());
+                .map(this::findDocumentByIndex)
+                .map(this::mapDocument)
+                .collect(Collectors.toList());
+    }
+
+    private Document findDocumentByIndex(IndexDocument indexDocument) {
+        Long id = indexDocument.getId();
+        return documentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format("index for document with id [%d] not found", id))
+                );
+    }
+
+    private DocumentResponse mapDocument(Document document) {
+        String documentName = document.getDocumentName();
+        String username = document.getAuthor().getUsername();
+        return documentMapper.mapToDto(username, documentName);
     }
 }
