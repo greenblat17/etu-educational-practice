@@ -1,9 +1,12 @@
 package com.greenblat.etuep.service;
 
+import com.greenblat.etuep.dto.DocumentInfoResponse;
 import com.greenblat.etuep.dto.DocumentResponse;
 import com.greenblat.etuep.exception.ResourceNotFoundException;
 import com.greenblat.etuep.mapper.DocumentMapper;
+import com.greenblat.etuep.model.Document;
 import com.greenblat.etuep.model.User;
+import com.greenblat.etuep.repository.DocumentRepository;
 import com.greenblat.etuep.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,6 +25,7 @@ import java.util.stream.Collectors;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final DocumentRepository documentRepository;
     private final DocumentMapper documentMapper;
 
     @Override
@@ -43,7 +47,13 @@ public class UserService implements UserDetailsService {
                 ));
 
         return user.getDocuments().stream()
-                .map(document -> documentMapper.mapToDto(username, document.getDocumentName()))
+                .map(document -> documentMapper.mapToDto(username, document))
                 .collect(Collectors.toList());
+    }
+
+    public DocumentInfoResponse getDocument(Long id) {
+        Document document = documentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("document not found"));
+        return documentMapper.mapToInfoDto(document);
     }
 }

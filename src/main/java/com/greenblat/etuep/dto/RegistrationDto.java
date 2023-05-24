@@ -1,5 +1,7 @@
 package com.greenblat.etuep.dto;
 
+import com.greenblat.etuep.validation.UniqueUsername;
+import com.greenblat.etuep.validation.group.RegisterAction;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,6 +16,7 @@ import javax.validation.constraints.Size;
 public class RegistrationDto {
 
     @NotEmpty(message = "Name should not be empty")
+    @UniqueUsername(groups = RegisterAction.class)
     String username;
 
     @NotEmpty(message = "Password should not be empty")

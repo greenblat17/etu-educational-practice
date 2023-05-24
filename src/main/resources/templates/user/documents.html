@@ -1,14 +1,58 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" >
 <head>
     <meta charset="UTF-8">
-    <title>Documents By user</title>
+    <title>Document List</title>
 </head>
 <body>
 <div th:insert="~{fragment :: header}"></div>
 
-<div th:each="document : ${documents}">
-    <span th:text="${document.getDocumentName()}"></span>
+<form th:action="@{/users/search-file}" th:method="GET">
+    <label for="search-line">Введите имя: </label>
+    <input type="text" id="search-line" th:name="line">
+    <br>
+
+    <input type="submit" value="Искать">
+</form>
+
+<div th:each="document : ${documentsContainsText}">
+    <a th:href="@{/users/document/{id} (id=${document.id})}"
+       th:text="${document.documentName + ' ' + document.id} "></a>
 </div>
+
+<!--<p th:if="${not found}">Document not found.</p>-->
+
+<table>
+    <thead>
+    <tr>
+        <th>Document</th>
+        <th>Author</th>
+        <th>Date</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="document : ${documents}">
+        <td><a th:href="@{/users/document/{id} (id=${document.id})}"
+               th:text="${document.documentName}"></a></td>
+        <td th:text="${document.author}"></td>
+        <td th:text="${document.updatedDate}"></td>
+    </tr>
+    </tbody>
+</table>
+
+
+
+<form th:action="@{/api/v1/documents/upload}" th:method="POST" enctype="multipart/form-data">
+    <label for="filename">Name:</label>
+    <input type="text" id="filename" th:name="filename" required>
+    <br><br>
+
+    <label for="file">File:</label>
+    <input type="file" id="file" th:name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt">
+    <br><br>
+
+    <button type="submit">Update</button>
+</form>
+
 </body>
 </html>

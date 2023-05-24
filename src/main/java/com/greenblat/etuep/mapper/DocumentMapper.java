@@ -1,6 +1,6 @@
 package com.greenblat.etuep.mapper;
 
-import com.greenblat.etuep.dto.DeleteDocumentDto;
+import com.greenblat.etuep.dto.DocumentInfoResponse;
 import com.greenblat.etuep.dto.DocumentResponse;
 import com.greenblat.etuep.model.Document;
 import com.greenblat.etuep.model.IndexDocument;
@@ -25,27 +25,42 @@ public class DocumentMapper {
                 .build();
     }
 
-    public Document mapToDocument(DeleteDocumentDto dto, User author) {
-        return Document.builder()
-                .documentName(dto.getDocumentName())
-                .author(author)
-                .downloadDate(dto.getDownloadDate())
-                .updateDate(dto.getUpdateDate())
-                .build();
-    }
-
     public IndexDocument mapDocumentToIndexDocument(Document document) {
         return IndexDocument.builder()
                 .id(document.getId())
-                .text(new String(document.getDocumentText(), StandardCharsets.UTF_8))
+                .text(getDocumentText(document))
                 .build();
     }
 
-    public DocumentResponse mapToDto(String username, String filename) {
+    public DocumentResponse mapToDto(Document document) {
         return DocumentResponse.builder()
-                .author(username)
-                .documentName(filename)
+                .id(document.getId())
+                .author(document.getAuthor().getUsername())
+                .documentName(document.getDocumentName())
+                .updatedDate(document.getUpdateDate())
                 .build();
+    }
+
+    public DocumentResponse mapToDto(String username, Document document) {
+        return DocumentResponse.builder()
+                .id(document.getId())
+                .author(username)
+                .documentName(document.getDocumentName())
+                .updatedDate(document.getUpdateDate())
+                .build();
+    }
+
+    public DocumentInfoResponse mapToInfoDto(Document document) {
+        return DocumentInfoResponse.builder()
+                .documentName(document.getDocumentName())
+                .author(document.getAuthor().getUsername())
+                .updateDate(document.getDownloadDate())
+                .documentText(getDocumentText(document))
+                .build();
+    }
+
+    private String getDocumentText(Document document) {
+        return new String(document.getDocumentText(), StandardCharsets.UTF_8);
     }
 
 }

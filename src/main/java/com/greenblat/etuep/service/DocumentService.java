@@ -1,6 +1,5 @@
 package com.greenblat.etuep.service;
 
-import com.greenblat.etuep.dto.DeleteDocumentDto;
 import com.greenblat.etuep.dto.DocumentResponse;
 import com.greenblat.etuep.exception.ResourceNotFoundException;
 import com.greenblat.etuep.mapper.DocumentMapper;
@@ -50,12 +49,13 @@ public class DocumentService {
         return DocumentResponse.builder()
                 .documentName(filename)
                 .author(userDetails.getUsername())
+                .updatedDate(document.getUpdateDate())
                 .build();
     }
 
     @SneakyThrows
     @Transactional
-    public Document updateDocument(MultipartFile file, String filename) {
+    public DocumentResponse updateDocument(MultipartFile file, String filename, UserDetails userDetails) {
         Document updatedDocument = findDocument(filename);
 
         byte[] updatedText = file.getBytes();
@@ -71,27 +71,20 @@ public class DocumentService {
         updateIndexDocument.setText(new String(updatedText, StandardCharsets.UTF_8));
         indexDocumentRepository.save(updateIndexDocument);
 
-        return documentRepository.save(updatedDocument);
+        Document document = documentRepository.save(updatedDocument);
+        return documentMapper.mapToDto(userDetails.getUsername(), document);
     }
 
     @Transactional
-    public void deleteDocument(DeleteDocumentDto documentDto, UserDetails userDetails) {
-        User user = findUser(userDetails.getUsername());
-
-        Document removedDocument = documentMapper.mapToDocument(documentDto, user);
-
-        documentRepository.delete(removedDocument);
-
-        IndexDocument indexDocument = documentMapper.mapDocumentToIndexDocument(removedDocument);
-        indexDocumentRepository.delete(indexDocument);
+    public void deleteDocument(Long id) {
+        documentRepository.deleteById(id);
+        indexDocumentRepository.deleteById(id);
     }
 
-    public Document getDocument(String filename, String downloadTime) {
-        LocalDate date = LocalDate.parse(downloadTime);
-
-        return documentRepository.findDocumentByDocumentNameAndDownloadDate(filename, date)
+    public Document getDocument(Long id) {
+        return documentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        String.format("document with name [%s] and download date [%s] not found", filename, downloadTime))
+                        String.format("document with id [%d] not found", id))
                 );
     }
 

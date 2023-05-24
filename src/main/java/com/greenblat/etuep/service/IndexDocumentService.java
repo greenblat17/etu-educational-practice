@@ -5,9 +5,12 @@ import com.greenblat.etuep.exception.ResourceNotFoundException;
 import com.greenblat.etuep.mapper.DocumentMapper;
 import com.greenblat.etuep.model.Document;
 import com.greenblat.etuep.model.IndexDocument;
+import com.greenblat.etuep.model.User;
 import com.greenblat.etuep.repository.DocumentRepository;
 import com.greenblat.etuep.repository.IndexDocumentRepository;
+import com.greenblat.etuep.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,14 +24,18 @@ public class IndexDocumentService {
 
     private final IndexDocumentRepository indexDocumentRepository;
     private final DocumentRepository documentRepository;
+    private final UserRepository userRepository;
     private final DocumentMapper documentMapper;
 
-    public List<DocumentResponse> searchDocument(String searchLine) {
+    public List<DocumentResponse> searchDocument(String searchLine, UserDetails userDetails) {
         List<IndexDocument> indexDocuments = indexDocumentRepository.findByTextContains(searchLine);
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("user not found"));
 
         return indexDocuments.stream()
                 .map(this::findDocumentByIndex)
-                .map(this::mapDocument)
+                .filter(document -> user.getDocuments().contains(document))
+                .map(documentMapper::mapToDto)
                 .collect(Collectors.toList());
     }
 
@@ -40,9 +47,4 @@ public class IndexDocumentService {
                 );
     }
 
-    private DocumentResponse mapDocument(Document document) {
-        String documentName = document.getDocumentName();
-        String username = document.getAuthor().getUsername();
-        return documentMapper.mapToDto(username, documentName);
-    }
 }

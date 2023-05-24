@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Update Document</title>
+</head>
+<body>
+<h2>Update Document</h2>
+
+<form th:action="@{'/api/v1/documents/update?filename=' + ${filename}}" th:method="PUT" enctype="multipart/form-data">
+    <label for="file">File:</label>
+    <input type="file" id="file" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt">
+    <br><br>
+    <button type="submit">Update</button>
+</form>
+</body>
+</html>

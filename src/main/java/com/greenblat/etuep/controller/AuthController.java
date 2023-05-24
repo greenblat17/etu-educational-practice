@@ -4,7 +4,7 @@ import com.greenblat.etuep.dto.RegistrationDto;
 import com.greenblat.etuep.exception.UserNotRegisterException;
 import com.greenblat.etuep.handler.FieldErrorResponse;
 import com.greenblat.etuep.service.AuthService;
-import com.greenblat.etuep.validation.UserValidator;
+import com.greenblat.etuep.validation.group.RegisterAction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -14,12 +14,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import javax.validation.groups.Default;
+
 @Controller
 @RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
-    private final UserValidator userValidator;
 
     @GetMapping("/registration")
     public String registrationPage(@ModelAttribute("user") RegistrationDto registrationDto) {
@@ -27,9 +28,9 @@ public class AuthController {
     }
 
     @PostMapping
-    public String registrationPerform(@ModelAttribute("user") @Validated RegistrationDto registrationDto,
+    public String registrationPerform(@ModelAttribute("user") @Validated({Default.class, RegisterAction.class}) RegistrationDto registrationDto,
                                       BindingResult bindingResult) {
-        validationUser(registrationDto, bindingResult);
+        validationUser(bindingResult);
 
         authService.registrationUser(registrationDto);
         return "redirect:/login";
@@ -40,9 +41,7 @@ public class AuthController {
         return "auth/login";
     }
 
-    private void validationUser(RegistrationDto user, BindingResult bindingResult) {
-        userValidator.validate(user, bindingResult);
-
+    private void validationUser(BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             FieldErrorResponse error = new FieldErrorResponse();
 
