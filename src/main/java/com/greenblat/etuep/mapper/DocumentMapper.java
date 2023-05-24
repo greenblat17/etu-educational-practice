@@ -1,5 +1,6 @@
 package com.greenblat.etuep.mapper;
 
+import com.greenblat.etuep.dto.DeleteDocumentDto;
 import com.greenblat.etuep.dto.DocumentResponse;
 import com.greenblat.etuep.model.Document;
 import com.greenblat.etuep.model.IndexDocument;
@@ -21,6 +22,15 @@ public class DocumentMapper {
                 .downloadDate(LocalDate.now())
                 .updateDate(LocalDate.now())
                 .documentText(file.getBytes())
+                .build();
+    }
+
+    public Document mapToDocument(DeleteDocumentDto dto, User author) {
+        return Document.builder()
+                .documentName(dto.getDocumentName())
+                .author(author)
+                .downloadDate(dto.getDownloadDate())
+                .updateDate(dto.getUpdateDate())
                 .build();
     }
 
