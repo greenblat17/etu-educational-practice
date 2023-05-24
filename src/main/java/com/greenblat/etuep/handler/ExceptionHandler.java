@@ -1,5 +1,6 @@
 package com.greenblat.etuep.handler;
 
+import com.greenblat.etuep.exception.DeleteDocumentException;
 import com.greenblat.etuep.exception.ResourceNotFoundException;
 import com.greenblat.etuep.exception.UserNotRegisterException;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,15 @@ public class ExceptionHandler {
 
     @org.springframework.web.bind.annotation.ExceptionHandler(value = UserNotRegisterException.class)
     public ExceptionDto handleException(UserNotRegisterException e) {
+        return new ExceptionDto(
+                e.getMessage(),
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST
+        );
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(value = DeleteDocumentException.class)
+    public ExceptionDto handleException(DeleteDocumentException e) {
         return new ExceptionDto(
                 e.getMessage(),
                 LocalDateTime.now(),
