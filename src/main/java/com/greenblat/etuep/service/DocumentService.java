@@ -1,5 +1,6 @@
 package com.greenblat.etuep.service;
 
+import com.greenblat.etuep.dto.DeleteDocumentDto;
 import com.greenblat.etuep.dto.DocumentResponse;
 import com.greenblat.etuep.exception.ResourceNotFoundException;
 import com.greenblat.etuep.mapper.DocumentMapper;
@@ -41,11 +42,7 @@ public class DocumentService {
         Document mapToDocument = documentMapper.mapToDocument(file, filename, user);
         Document document = documentRepository.save(mapToDocument);
 
-        List<Document> userDocuments = user.getDocuments();
-        if (userDocuments == null) {
-            userDocuments = new ArrayList<>();
-        }
-        userDocuments.add(document);
+        checkIfEmptyCreateList(user.getDocuments()).add(document);
 
         IndexDocument indexDocument = documentMapper.mapDocumentToIndexDocument(document);
         indexDocumentRepository.save(indexDocument);
@@ -78,12 +75,10 @@ public class DocumentService {
     }
 
     @Transactional
-    public void deleteDocument(Document document, UserDetails userDetails) {
+    public void deleteDocument(DeleteDocumentDto documentDto, UserDetails userDetails) {
         User user = findUser(userDetails.getUsername());
-        document.setAuthor(user);
 
-        Document removedDocument = findDocument(document.getDocumentName());
-
+        Document removedDocument = documentMapper.mapToDocument(documentDto, user);
 
         documentRepository.delete(removedDocument);
 
@@ -112,5 +107,9 @@ public class DocumentService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         String.format("document with name [%s] not found", filename))
                 );
+    }
+
+    private List<Document> checkIfEmptyCreateList(List<Document> userDocuments) {
+        return userDocuments == null ? new ArrayList<>() : userDocuments;
     }
 }

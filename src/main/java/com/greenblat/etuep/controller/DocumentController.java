@@ -1,5 +1,6 @@
 package com.greenblat.etuep.controller;
 
+import com.greenblat.etuep.dto.DeleteDocumentDto;
 import com.greenblat.etuep.dto.DocumentResponse;
 import com.greenblat.etuep.model.Document;
 import com.greenblat.etuep.service.DocumentService;
@@ -41,9 +42,9 @@ public class DocumentController {
     }
 
     @DeleteMapping("/delete")
-    public void deleteDocument(@RequestBody Document document,
+    public void deleteDocument(@RequestBody DeleteDocumentDto deleteDocumentDto,
                                @AuthenticationPrincipal UserDetails userDetails) {
-        documentService.deleteDocument(document, userDetails);
+        documentService.deleteDocument(deleteDocumentDto, userDetails);
     }
 
     @GetMapping("/search")
