@@ -3,11 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <title>Update Document</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        form {
+            margin: 20px 0;
+        }
+
+        label {
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        input[type="text"], input[type="file"] {
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+
+        input[type="submit"], button[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover, button[type="submit"]:hover {
+            background-color: #3e8e41;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
 <h2>Update Document</h2>
 
-<form th:action="@{'/api/v1/documents/update?filename=' + ${filename}}" th:method="PUT" enctype="multipart/form-data">
+<form th:action="@{/api/v1/documents/update/{id} (id=${id})}" th:method="PUT" enctype="multipart/form-data">
     <label for="file">File:</label>
     <input type="file" id="file" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt">
     <br><br>

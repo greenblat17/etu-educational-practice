@@ -55,14 +55,13 @@ public class DocumentService {
 
     @SneakyThrows
     @Transactional
-    public DocumentResponse updateDocument(MultipartFile file, String filename, UserDetails userDetails) {
-        Document updatedDocument = findDocument(filename);
+    public DocumentResponse updateDocument(MultipartFile file, Long id, UserDetails userDetails) {
+        Document updatedDocument = findDocument(id);
 
         byte[] updatedText = file.getBytes();
         updatedDocument.setDocumentText(updatedText);
         updatedDocument.setUpdateDate(LocalDate.now());
 
-        Long id = updatedDocument.getId();
         IndexDocument updateIndexDocument = indexDocumentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         String.format("index for document with id [%d] not found", id))
@@ -95,10 +94,10 @@ public class DocumentService {
                 );
     }
 
-    private Document findDocument(String filename) {
-        return documentRepository.findDocumentByDocumentName(filename)
+    private Document findDocument(Long id) {
+        return documentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        String.format("document with name [%s] not found", filename))
+                        String.format("document with id [%d] not found", id))
                 );
     }
 

@@ -37,10 +37,10 @@ public class UserController {
         return "user/document";
     }
 
-    @GetMapping("/document/update")
-    public String updateDocument(@RequestParam("filename") String filename,
+    @GetMapping("/document/update/{id}")
+    public String updateDocument(@PathVariable Long id,
                                  Model model) {
-        model.addAttribute("filename", filename);
+        model.addAttribute("id", id);
         return "user/update";
     }
 

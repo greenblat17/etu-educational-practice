@@ -1,14 +1,77 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" >
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Document List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        form {
+            margin: 20px 0;
+        }
+
+        label {
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        input[type="text"], input[type="file"] {
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+
+        input[type="submit"], button[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover, button[type="submit"]:hover {
+            background-color: #3e8e41;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
 <div th:insert="~{fragment :: header}"></div>
 
 <form th:action="@{/users/search-file}" th:method="GET">
-    <label for="search-line">Введите имя: </label>
+    <label for="search-line">Введите текст: </label>
     <input type="text" id="search-line" th:name="line">
     <br>
 
@@ -17,10 +80,11 @@
 
 <div th:each="document : ${documentsContainsText}">
     <a th:href="@{/users/document/{id} (id=${document.id})}"
-       th:text="${document.documentName + ' ' + document.id} "></a>
+       th:text="${document.documentName} "></a>
 </div>
 
-<!--<p th:if="${not found}">Document not found.</p>-->
+<p th:if="${documentsContainsText!=null && documentsContainsText.isEmpty()}">Documents not found</p>
+
 
 <table>
     <thead>
@@ -40,8 +104,6 @@
     </tbody>
 </table>
 
-
-
 <form th:action="@{/api/v1/documents/upload}" th:method="POST" enctype="multipart/form-data">
     <label for="filename">Name:</label>
     <input type="text" id="filename" th:name="filename" required>
@@ -51,7 +113,7 @@
     <input type="file" id="file" th:name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt">
     <br><br>
 
-    <button type="submit">Update</button>
+    <button type="submit">Download</button>
 </form>
 
 </body>

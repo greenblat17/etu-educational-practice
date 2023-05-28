@@ -14,6 +14,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 @RestController
@@ -24,17 +26,23 @@ public class DocumentController {
     private final DocumentService documentService;
 
     @PostMapping("/upload")
-    public DocumentResponse uploadDocument(@RequestParam("file") MultipartFile file,
+    public ResponseEntity<Void> uploadDocument(@RequestParam("file") MultipartFile file,
                                            @RequestParam("filename") String filename,
-                                           @AuthenticationPrincipal UserDetails userDetails) {
-        return documentService.saveDocument(file, filename, userDetails);
+                                           @AuthenticationPrincipal UserDetails userDetails,
+                                           HttpServletResponse response) throws IOException {
+        documentService.saveDocument(file, filename, userDetails);
+        response.sendRedirect("/users/documents");
+        return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/update")
-    public DocumentResponse updateDocument(@RequestParam("file") MultipartFile file,
-                                           @RequestParam("filename") String filename,
-                                           @AuthenticationPrincipal UserDetails userDetails) {
-        return documentService.updateDocument(file, filename, userDetails);
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Void> updateDocument(@RequestParam("file") MultipartFile file,
+                                               @PathVariable("id") Long id,
+                                               @AuthenticationPrincipal UserDetails userDetails,
+                                               HttpServletResponse response) throws IOException {
+        DocumentResponse document = documentService.updateDocument(file, id, userDetails);
+        response.sendRedirect("/users/document/" + document.getId());
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/download/{id}")
@@ -55,8 +63,10 @@ public class DocumentController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteDocument(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> deleteDocument(@PathVariable("id") Long id,
+                                               HttpServletResponse response) throws IOException {
         documentService.deleteDocument(id);
+        response.sendRedirect("/users/documents");
         return ResponseEntity.ok().build();
     }
 

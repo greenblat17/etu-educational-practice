@@ -3,25 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <title>Document Details</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div th:insert="~{fragment :: header}"></div>
+<div style="background-color: #333; color: white; padding: 10px;"
+     th:insert="~{fragment :: header}"></div>
 
-<h2 th:text="${document.documentName}"></h2>
+<div style="margin: 20px; padding: 20px; border: 1px solid #ccc;">
+    <h2 style="font-size: 28px; margin-bottom: 10px;"
+        th:text="${document.documentName}"></h2>
 
-<p th:text="${document.documentText}"></p>
-<p>Upload Date: <span th:text="${document.updateDate}"></span></p>
+    <p style="font-size: 18px; line-height: 1.5; margin-bottom: 20px;"
+       th:text="${document.documentText}"></p>
+    <p style="font-size: 14px;color: #999;margin-bottom: 20px;">
+        Upload Date: <span th:text="${document.updateDate}"></span>
+    </p>
 
-<a th:href="@{'/users/document/update?filename=' + ${document.documentName}}">Update</a>
+    <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+        <a style="
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-right: 10px;"
+           th:href="@{/users/document/update/{id} (id=${id})}">Update</a>
 
-<form th:action="@{/api/v1/documents/delete/{id} (id=${id})}" th:method="DELETE">
-    <input type="submit" value="Удалить">
-</form>
+        <form style="display: inline-block;"
+              th:action="@{/api/v1/documents/delete/{id} (id=${id})}" th:method="DELETE">
+            <input class="delete-button" type="submit" value="Удалить">
+        </form>
 
-<form th:action="@{/api/v1/documents/download/{id} (id=${id})}" th:method="GET">
-    <input type="submit" value="Скачать">
-</form>
-
+        <form style="display: inline-block;"
+              th:action="@{/api/v1/documents/download/{id} (id=${id})}" th:method="GET">
+            <input style="
+                background-color: #2196F3;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                font-size: 16px;
+                cursor: pointer;
+                border-radius: 5px;"
+                   type="submit" value="Скачать">
+        </form>
+    </div>
+</div>
 
 </body>
 </html>
